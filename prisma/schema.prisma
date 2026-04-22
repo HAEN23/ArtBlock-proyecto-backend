@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id              String   @id @default(uuid())
+  nombre_usuario  String   @unique
+  email           String   @unique
+  password_hash   String
+  foto_perfil_url String?
+  creado_en       DateTime @default(now())
+
+  obras           Obra[]
+  sesiones        Sesion[]
+}
+
+model Obra {
+  id              String   @id @default(uuid())
+  artista_id      String
+  titulo          String
+  tipo_de_archivo String
+  imagen_url      String
+  creado_en       DateTime @default(now())
+
+  artista         Usuario  @relation(fields: [artista_id], references: [id], onDelete: Cascade)
+}
+
+model Sesion {
+  id         String   @id @default(uuid())
+  usuario_id String
+  token      String   @unique
+  expira_en  DateTime
+  creado_en  DateTime @default(now())
+
+  usuario    Usuario  @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
+}
