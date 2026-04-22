@@ -34,9 +34,9 @@ export const subirObra = async (req: AuthRequest, res: Response): Promise<any> =
     const nuevaObra = await prisma.obra.create({
       data: {
         titulo,
-        tipo_de_archivo, // Agregado porque tu schema lo requiere
+        tipo_de_archivo, 
         imagen_url: resultadoCloudinary.secure_url,
-        artista_id: id_del_usuario // ¡El nombre correcto que definiste en tu Prisma!
+        artista_id: id_del_usuario 
       }
     });
 
@@ -49,5 +49,33 @@ export const subirObra = async (req: AuthRequest, res: Response): Promise<any> =
   } catch (error) {
     console.error(error);
     res.status(500).json({ exito: false, mensaje: 'Error al subir la obra' });
+  }
+};
+
+// ==========================================
+// NUEVA FUNCIÓN: OBTENER LAS OBRAS DEL USUARIO
+// ==========================================
+export const obtenerMisObras = async (req: AuthRequest, res: Response): Promise<any> => {
+  try {
+    const id_del_usuario = req.usuario.id;
+
+    // Buscamos en PostgreSQL todas las obras que pertenezcan a este ID
+    const obras = await prisma.obra.findMany({
+      where: { 
+        artista_id: id_del_usuario 
+      },
+      orderBy: { 
+        creado_en: 'desc' // Las acomodamos para que la más nueva salga primero
+      }
+    });
+
+    res.json({ 
+      exito: true, 
+      obras 
+    });
+
+  } catch (error) {
+    console.error("Error al obtener las obras:", error);
+    res.status(500).json({ exito: false, mensaje: 'Error interno al consultar la base de datos' });
   }
 };

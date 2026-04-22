@@ -1,13 +1,15 @@
 import { Router } from 'express';
-import { subirObra } from '../controllers/obra.controller';
+// Importamos ambas funciones desde el controlador
+import { subirObra, obtenerMisObras } from '../controllers/obra.controller'; 
 import { verificarToken } from '../middlewares/auth.middleware';
 import { upload } from '../middlewares/upload.middleware';
 
 const router = Router();
 
-// Ruta: POST /api/obras/subir
-// 1. verificarToken valida que el usuario haya iniciado sesión
-// 2. upload.single('imagen') atrapa el archivo enviado desde el frontend
+// Ruta para subir una nueva obra (usa FormData)
 router.post('/subir', verificarToken, upload.single('imagen'), subirObra);
+
+// Nueva ruta para obtener las obras del usuario actual
+router.get('/mias', verificarToken, obtenerMisObras); 
 
 export default router;
